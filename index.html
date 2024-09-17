@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile-Friendly Metronome</title>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.1s;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 20px;
+        }
+        .bpm-select, .time-signature-select, #customBpm {
+            margin-bottom: 10px;
+            font-size: 18px;
+            width: 100%;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            width: 100%;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .count-display {
+            font-size: 40px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="bpm">Select BPM:</label>
+        <select id="bpm" class="bpm-select">
+            <option value="60">60 BPM</option>
+            <option value="80">80 BPM</option>
+            <option value="100">100 BPM</option>
+            <option value="120">120 BPM</option>
+            <option value="140">140 BPM</option>
+            <option value="160">160 BPM</option>
+        </select>
+
+        <label for="timeSignature">Select Time Signature:</label>
+        <select id="timeSignature" class="time-signature-select">
+            <option value="4">4/4</option>
+            <option value="3">3/4</option>
+            <option value="5">5/4</option>
+        </select>
+
+        <label for="customBpm">Custom BPM:</label>
+        <input type="number" id="customBpm" placeholder="Enter BPM" inputmode="numeric">
+
+        <button id="startButton">Start Metronome</button>
+        <button id="stopButton">Stop Metronome</button>
+
+        <div class="count-display" id="countDisplay">1</div>
+    </div>
+
+    <script>
+        const bpmSelect = document.getElementById('bpm');
+        const timeSignatureSelect = document.getElementById('timeSignature');
+        const customBpmInput = document.getElementById('customBpm');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const countDisplay = document.getElementById('countDisplay');
+
+        let interval;
+        let beatCount = 0;
+
+        // Start Metronome
+        startButton.addEventListener('click', () => {
+            if (interval) clearInterval(interval);
+
+            const bpm = parseInt(bpmSelect.value);
+            const intervalTime = (60 / bpm) * 1000;
+            const timeSignature = parseInt(timeSignatureSelect.value);
+
+            interval = setInterval(() => {
+                beatCount = (beatCount % timeSignature) + 1;
+                countDisplay.textContent = beatCount;
+
+                if (beatCount === 1) {
+                    document.body.style.backgroundColor = 'green';
+                } else {
+                    document.body.style.backgroundColor = 'red';
+                }
+            }, intervalTime);
+        });
+
+        // Stop Metronome
+        stopButton.addEventListener('click', () => {
+            clearInterval(interval);
+            document.body.style.backgroundColor = 'white'; // Reset background
+            countDisplay.textContent = '1'; // Reset count to 1
+        });
+
+        // Custom BPM Input
+        customBpmInput.addEventListener('change', () => {
+            const customBpm = parseInt(customBpmInput.value);
+            if (customBpm > 0 && customBpm <= 300) {
+                bpmSelect.value = customBpm;
+            }
+        });
+    </script>
+</body>
+</html>
+
