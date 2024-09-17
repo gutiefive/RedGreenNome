@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Metronome</title>
+    <title>Accurate Metronome</title>
     <style>
         body {
             height: 100vh;
@@ -38,7 +38,7 @@
         .count-display {
             font-size: 40px;
             margin-top: 20px;
-            display: none; /* Initially hidden */
+            display: none;
         }
     </style>
 </head>
@@ -83,14 +83,31 @@
 
         let interval;
         let beatCount = 0;
+        let timeSignature = 4;  // Default to 4/4 time signature
+
+        const colors = {
+            1: 'green',
+            2: 'blue',
+            3: 'orange',
+            4: 'purple'
+        };
+
+        function runMetronome() {
+            beatCount = (beatCount % timeSignature) + 1;
+            countDisplay.textContent = beatCount;
+            document.body.style.backgroundColor = colors[beatCount];
+
+            // Set the next interval based on BPM
+            interval = setTimeout(runMetronome, intervalTime);
+        }
+
+        let intervalTime = 0;  // Stores the interval time between beats
 
         // Start Metronome
         startButton.addEventListener('click', () => {
-            if (interval) clearInterval(interval);
-
             const bpm = parseInt(bpmSelect.value);
-            const intervalTime = (60 / bpm) * 1000;
-            const timeSignature = parseInt(timeSignatureSelect.value);
+            intervalTime = (60 / bpm) * 1000; // milliseconds per beat
+            timeSignature = parseInt(timeSignatureSelect.value);  // Get the time signature
 
             // Hide dropdowns and show the count display
             dropdowns.style.display = 'none';
@@ -98,21 +115,16 @@
             startButton.style.display = 'none';
             stopButton.style.display = 'block';
 
-            interval = setInterval(() => {
-                beatCount = (beatCount % timeSignature) + 1;
-                countDisplay.textContent = beatCount;
+            // Set initial values
+            beatCount = 0;
 
-                if (beatCount === 1) {
-                    document.body.style.backgroundColor = 'green';
-                } else {
-                    document.body.style.backgroundColor = 'red';
-                }
-            }, intervalTime);
+            // Start metronome
+            interval = setTimeout(runMetronome, intervalTime);
         });
 
         // Stop Metronome
         stopButton.addEventListener('click', () => {
-            clearInterval(interval);
+            clearTimeout(interval);
             document.body.style.backgroundColor = 'white'; // Reset background
             countDisplay.style.display = 'none'; // Hide the count display
             dropdowns.style.display = 'block'; // Show the dropdowns again
